@@ -21,7 +21,7 @@ func assignOutput (outNameNumber int, output []byte, typ string, expr *CXExpress
 	// fmt.Println(expr.OutputNames[outNameNumber].Typ, typ, expr.Operator.Name)
 
 	///expr.OutputNames[outNameNumber].Typ = typ
-
+	
 	for _, char := range outName {
 		if char == '.' {
 			identParts := strings.Split(outName, ".")
@@ -137,9 +137,9 @@ func assignOutput (outNameNumber int, output []byte, typ string, expr *CXExpress
 		}
 	}
 	
-	// if len(call.State) > 0 {
-	// 	fmt.Println(call.State[0].Name, outName)
-	// }
+	if outName == "testI32" {
+		fmt.Println("here", call.State[0].Name, outName)
+	}
 
 	call.State = append(call.State, MakeDefinition(outName, &output, typ))
 	return nil
@@ -896,6 +896,9 @@ func resolveIdent (lookingFor string, call *CXCall) (*CXArgument, error) {
 			if isImported {
 				if def, err := mod.GetDefinition(concat(identParts[1:]...)); err == nil {
 					resolvedIdent = def
+					// if !IsBasicType(def.Typ) {
+					// 	resolvedIdent.Typ = fmt.Sprintf("%s.%s", mod.Name, def.Typ)
+					// }
 				}
 			} else {
 				return nil, errors.New(fmt.Sprintf("module '%s' was not imported or does not exist", mod.Name))
@@ -974,7 +977,19 @@ func resolveIdent (lookingFor string, call *CXCall) (*CXArgument, error) {
 	if resolvedIdent != nil && !isStructFld && !isArray {
 		// if it was a struct field, we already created the argument above for efficiency reasons
 		// the same goes to arrays in the form ident[index]
-		arg := MakeArgument(resolvedIdent.Value, resolvedIdent.Typ)
+
+		
+		var typ string
+		if !IsBasicType(resolvedIdent.Typ) {
+			if mod, err := call.Context.GetModule(identParts[0]); err == nil {
+				typ = fmt.Sprintf("%s.%s", mod.Name, resolvedIdent.Typ)
+			} else {
+				typ = resolvedIdent.Typ
+			}
+		} else {
+			typ = resolvedIdent.Typ
+		}
+		arg := MakeArgument(resolvedIdent.Value, typ)
 		return arg, nil
 	}
 	return nil, errors.New(fmt.Sprintf("identifier '%s' could not be resolved", lookingFor))
@@ -1231,6 +1246,7 @@ func (cxt *CXProgram) PrintProgram (withAffs bool) {
 
 	i := 0
 	for _, mod := range cxt.Modules {
+		cxt.SelectModule(mod.Name)
 		if mod.Name == CORE_MODULE || mod.Name == "glfw" || mod.Name == "gl" || mod.Name == "gltext" {
 			continue
 		}
@@ -1621,7 +1637,7 @@ func GetIdentType (lookingFor string, line int, fileName string, cxt *CXProgram)
 					return def.Typ, nil
 				}
 			} else {
-				return "", errors.New(fmt.Sprintf("module '%s' was not imported or does not exist", extMod.Name))
+				return "", errors.New(fmt.Sprintf("%s: %d: module '%s' was not imported or does not exist", fileName, line, extMod.Name))
 			}
 		} else {
 			// local struct instance
@@ -1752,6 +1768,6 @@ func GetIdentType (lookingFor string, line int, fileName string, cxt *CXProgram)
 			return def.Typ, nil
 		}
 	}
-	
+
 	return "", errors.New(fmt.Sprintf("%s: %d: identifier '%s' could not be resolved", fileName, line, lookingFor))
 }

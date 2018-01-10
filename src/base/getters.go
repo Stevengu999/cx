@@ -152,6 +152,11 @@ func (cxt *CXProgram) GetModule (modName string) (*CXModule, error) {
 }
 
 func (cxt *CXProgram) GetStruct (strctName string, modName string) (*CXStruct, error) {
+	// typParts := strings.Split(strctName, ".")
+	// if len(typParts) > 1 && typParts[0] == modName {
+	// 	strctName = strings.Join(typParts[1:], ".")
+	// }
+	
 	// checking if pointer to struct
 	if strctName[0] == '*' {
 		for i, char := range strctName {

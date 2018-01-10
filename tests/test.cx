@@ -1197,6 +1197,10 @@ label4:
 		newTestStruct.testI32 = i32.add(c, 2)
 		testStructs3 = []testStruct.append(testStructs3, newTestStruct)
 	}
+
+	meowmeow := []testStruct.read(testStructs1, 3)
+	str.print("hi")
+	i32.print(meowmeow.testI32)
 	
 	var newNestedStructArrays nestedStructArrays
 	newNestedStructArrays.nested1 = testStructs1

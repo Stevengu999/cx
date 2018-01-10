@@ -1602,7 +1602,6 @@ assignExpression:
 
 			if fn, err := cxt.GetCurrentFunction(); err == nil {
 				for i, argL := range argsL {
-					//fmt.Println("here", argsR[i].Typ)
 					if argsR[i] == nil {
 						continue
 					}
@@ -1625,7 +1624,7 @@ assignExpression:
 
 					if len(typeParts) > 1 {
 						typ = "str"
-						secondTyp = typeParts[1] // i32, f32, etc
+						secondTyp = strings.Join(typeParts[1:], ".")
 					} else if typeParts[0] == "ident" {
 						typ = "str"
 						secondTyp = "ident"
@@ -1878,7 +1877,7 @@ nonAssignExpression:
 							
 							$$ = args
 						} else {
-							fmt.Printf("Function '%s' not defined\n", $1)
+							fmt.Printf("%s: %d: function '%s' not defined\n", fileName, yyS[yypt-0].line + 1, $1)
 						}
 					}
 				}

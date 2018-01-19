@@ -1,0 +1,8 @@
+package main
+
+//var multi [][]i32
+
+func main (num i32) (out i32) {
+	tilemap := [][]i32.make(6)
+	//[][]i32.print(multi)
+}

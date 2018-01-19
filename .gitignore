@@ -52,3 +52,5 @@ blue.png
 red.png
 *.nn.go
 cx0.go
+golang-empty-grammar.y
+golang-grammar.y

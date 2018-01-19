@@ -86,9 +86,6 @@
 /new/        { return NEW        }
 /\**(\[\])*(bool|str|i32|i64|f32|f64|byte)/ {
 	typ := yylex.Text();
-
-	CreateMDimFuncs(typ, lval.line + 1)
-	
 	lval.tok = typ
 	return BASICTYPE
 }
@@ -140,12 +137,6 @@
 }
 /[.\[\]a-zA-Z0-9_]+/ {
 	lval.tok = yylex.Text()
-
-	identParts := strings.Split(yylex.Text(), ".")
-	if len(identParts) > 1 {
-		CreateMDimFuncs(identParts[0], lval.line + 1)
-	}
-	
 	return IDENT
 }
 /;/ { return int(yylex.Text()[0]) }
